@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"sync"
+	"flag"
 )
 
 type templateHandler struct {
@@ -18,17 +19,19 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.template = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	t.template.Execute(w, nil)
+	t.template.Execute(w, r)
 }
 
 func main() {
+	var addr = flag.String("addr", ":8080", "Application address")
 	r := newRoom()
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 	// チャットルームを開始
 	go r.run()
 	// WEBサーバーを起動する
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Webサーバ起動します ポート：", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("Listen And Serve:", err)
 	}
 }
