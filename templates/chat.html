@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>チャット</title>
@@ -42,7 +43,7 @@ WebSocketを使ったチャットアプリケーション
             socket = new WebSocket("ws://{{.Host}}/room");
             socket.onclose = function () {
                 alert("接続が終了しました");
-            }
+            };
             socket.onmessage = function (e) {
                 messages.append($('<li>').text(e.data));
             }

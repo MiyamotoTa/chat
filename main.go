@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
+	"github.com/MiyamotoTa/trace"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
-	"flag"
-	"github.com/MiyamotoTa/trace"
-	"os"
 )
 
 type templateHandler struct {
@@ -31,6 +31,7 @@ func main() {
 	// 記録を無効化
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.Handle("/room", r)
 	// チャットルームを開始
 	go r.run()
