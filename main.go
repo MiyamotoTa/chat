@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/MiyamotoTa/trace"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
 	"html/template"
 	"log"
 	"net/http"
@@ -26,7 +28,18 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	var addr = flag.String("addr", ":8080", "Application address")
+	var googleClientId = flag.String("google_client_id", "", "Google OAuth client ID")
+	var googleClientSecret = flag.String("google_client_secret", "", "Google OAuth client secret")
 	flag.Parse()
+	// Gomniauthのセットアップ
+	gomniauth.SetSecurityKey("miyamoto_ta/chat")
+	gomniauth.WithProviders(
+		google.New(
+			*googleClientId,
+			*googleClientSecret,
+			"http://localhost:8080/auth/callback/google",
+		),
+	)
 	r := newRoom()
 	// 記録を無効化
 	r.tracer = trace.New(os.Stdout)
