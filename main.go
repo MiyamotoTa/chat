@@ -5,13 +5,13 @@ import (
 	"github.com/MiyamotoTa/trace"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/objx"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
-	"github.com/stretchr/objx"
 )
 
 type templateHandler struct {
@@ -53,6 +53,16 @@ func main() {
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/logout", func(writer http.ResponseWriter, request *http.Request) {
+		http.SetCookie(writer, &http.Cookie{
+			Name:   "auth",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
+		writer.Header()["Location"] = []string{"/chat"}
+		writer.WriteHeader(http.StatusTemporaryRedirect)
+	})
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 	// チャットルームを開始
