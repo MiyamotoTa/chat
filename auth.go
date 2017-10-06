@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/objx"
 	"log"
 	"net/http"
 	"strings"
-	"github.com/stretchr/objx"
 )
 
 type authHandler struct {
@@ -64,7 +64,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalln("ユーザの取得に失敗しました", provider, "-", err)
 		}
 		authCookieValue := objx.New(map[string]interface{}{
-			"name": user.Name(),
+			"name":       user.Name(),
+			"avatar_url": user.AvatarURL(),
 		}).MustBase64()
 		// 認証情報から取得した Name フィールドの値を auth というクッキーに保持
 		http.SetCookie(w, &http.Cookie{
